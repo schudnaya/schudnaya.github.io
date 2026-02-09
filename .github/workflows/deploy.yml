@@ -22,7 +22,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install mkdocs
-          pip install mkdocs-material  # если используете эту тему
+          # Если тема доступна через pip
+          pip install mkdocs-bootstrap386
           
       - name: Build site
         run: mkdocs build
