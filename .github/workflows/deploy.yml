@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Полная история для переключения веток
       
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -22,14 +24,54 @@ jobs:
       - name: Install dependencies
         run: |
           pip install mkdocs
-          # Если тема доступна через pip
+          # Установите вашу тему bootstrap386
+          # Если тема на PyPI:
           pip install mkdocs-bootstrap386
           
       - name: Build site
         run: mkdocs build
         
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+      - name: Deploy to gh-pages branch
+        run: |
+          # Сохраняем текущую директорию
+          cd ${{ github.workspace }}
+          
+          # Создаем или переключаемся на ветку gh-pages
+          if git show-ref --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+            git pull origin gh-pages
+          else
+            git checkout --orphan gh-pages
+          fi
+          
+          # Удаляем всё, кроме .git
+          git rm -rf . || true
+          
+          # Копируем собранный сайт
+          cp -r ../site/* . || true
+          
+          # Добавляем файлы
+          git add -A
+          
+          # Проверяем есть ли изменения
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to deploy"
+          else
+            # Коммитим и пушим
+            git commit -m "🚀 Deploy MkDocs site - $(date '+%Y-%m-%d %H:%M:%S')
+            
+            Triggered by: ${{ github.event.head_commit.message || 'Manual deploy' }}
+            Commit: ${{ github.sha }}
+            Workflow: ${{ github.run_id }}"
+            
+            git push origin gh-pages --force
+            echo "✅ Successfully deployed to gh-pages branch!"
+          fi
+          
+          # Возвращаемся в исходную ветку
+          git checkout ${{ github.ref_name }}
