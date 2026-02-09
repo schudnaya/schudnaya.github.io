@@ -11,7 +11,3 @@ nav:
   - about:
     - setup: setup.md
   - instructions: instructions.md
-plugins:
-  # Include videos
-  - mkdocs-video
-  - awesome-pages
