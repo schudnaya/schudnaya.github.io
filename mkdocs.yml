@@ -1,0 +1,17 @@
+site_name: Сайт Сони
+site_description: Описание сайта
+site_author: Софья Чудная
+site_url: https://schudnaya.github.io/
+repo_url: https://github.com/schudnaya/schudnaya.github.io
+theme:
+  name: bootstrap386
+
+nav:
+  - main: index.md
+  - about:
+    - setup: setup.md
+  - instructions: instructions.md
+plugins:
+  # Include videos
+  - mkdocs-video
+  - awesome-pages
